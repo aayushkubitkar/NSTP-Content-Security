@@ -1,0 +1,54 @@
+certs:
+  - validca:
+      subjects:
+        - CA subjects dont matter
+      valid_length: 604800
+      issuer: validca #self signed
+      usages:
+        - Signing
+  - server:
+      subjects:
+        - 10.1.1.10
+        - localhost
+      issuer: validca
+      # valid_from ommited so will use current epoch time
+      valid_length: 604800
+      usages:
+        - ServerAuthentication  
+  - status:
+      subjects:
+        - 10.1.1.101
+        - 10.1.1.10
+        - localhost
+      valid_length: 604800
+      issuer: validca
+      usages:
+        - Status
+  - client:
+      subjects:
+        - nstpc
+      valid_length: 604800
+      issuer: validca
+      usages: 
+       - ClientAuthentication
+      staple:
+        status: Valid
+        valid_length: 604800
+        status_certificate: status
+
+pinned:
+  - server:
+    - 10.1.1.10
+  - status:
+    - 10.1.1.101
+
+stores:
+  - trusted_client:
+    - validca
+  - trusted_server:
+    - validca
+  - allowed: 
+    - client
+    - server
+    - validca
+  - revoked:

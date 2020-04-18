@@ -1,0 +1,59 @@
+docker run -itd \
+    --name nstpd-00 \
+    --network nstp \
+    --ip 10.1.1.10 \
+    -v $(pwd)/data:/data \
+    -e RUST_LOG=debug \
+    gcr.io/netsec/assignments/04-content_security-server \
+    nstp_server \
+        --protocol_version 4 \
+        -u /data/password_hashes \
+        -t /data/trusted_server \
+        -c /data/server.crt \
+        -k /data/server.key \
+        -p 22300 \
+        -s "10.1.1.101" \
+        --pinned_certs_path /data/pinned_certs.db
+
+docker run -itd \
+    --name nstpd-01 \
+    --network nstp \
+    --ip 10.1.1.11 \
+    -v $(pwd)/data:/data \
+    -e RUST_LOG=debug \
+    gcr.io/netsec/assignments/04-content_security-server \
+    nstp_server \
+        --protocol_version 4 \
+        -u /data/password_hashes \
+        -t /data/trusted_server \
+        -c /data/server2.crt \
+        -k /data/server2.key \
+        -p 22301 \
+        -s "10.1.1.101" \
+        --pinned_certs_path /data/pinned_certs.db
+
+docker run -itd \
+    --name nstp-statusd \
+    --network nstp \
+    --ip 10.1.1.101 \
+    -v $(pwd)/data:/data \
+    -e RUST_LOG=debug \
+    gcr.io/netsec/assignments/04-content_security-server \
+    nstp_status_server \
+        -p 22301 \
+        -s /data/status.crt \
+        -k /data/status.key \
+        -v /data/server.crt \
+        -v /data/client.crt
+
+docker run -it \
+    --name nstp_client \
+    --network nstp \
+    --ip 10.1.1.12 \
+    -v $(pwd)/data:/data nstp_client \
+    -t /data/trusted_client \
+    -c /data/client.crt \
+    -p /data/client.key \
+    -s "10.1.1.10:22300" \
+    -v "10.1.1.101:22301" \
+    -k "initial.js"
