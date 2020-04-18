@@ -16,6 +16,7 @@ class Document(object):
         """Initializer."""
         self.client = {userAgent:"nstpc", majorVersion:4, minorVersion:0}
         self.localStorage = {}
+
     @staticmethod
     def log(message: str) -> None:
         """Log a message to the console."""
@@ -37,14 +38,14 @@ class Document(object):
             if val.endswith(suffix):
                 logging.info("key is JS")
                 # TODO: Evaluate the associated content?
-                return self.evaluate(val)
+                self.evaluate(val)
             else:
                 logging.info(f"key is not a JS but {val}")
         except UnicodeDecodeError:
             logging.info(f"key is not a string but {value}")
         return value
 
-    async def remoteStore(nstpUrl: str, value: bytes) -> None:
+    async def remoteStore(self, nstpUrl: str, value: bytes) -> None:
         logging.info("inside remote Load")
         tmp = nstpUrl.split(":")
         server_address = tmp[0][7:]
@@ -79,5 +80,4 @@ class Interpreter(object):
         logging.info("in the JS evaluate method")
         res = self.context.eval_js("value")
         logging.info(res)
-        return res
         

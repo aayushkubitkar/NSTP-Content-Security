@@ -106,10 +106,8 @@ class Session(object):
             status = m.server_hello.certificate_status
         else:
             status = await self.fetch_certificate_status(m.server_hello.certificate)
-        subject=""
-        for x in m.server_hello.certificate.subjects:
-            subject = x
-        self.verifier.verify_server_certificate_status(m.server_hello.certificate, status, subject)
+
+        self.verifier.verify_server_certificate_status(m.server_hello.certificate, status, self.status_server_address)
 
         # Establish session keys
         self.reader_key, self.writer_key = \
